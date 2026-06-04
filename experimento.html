@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba F de Fisher - Diseño de Experimentos</title>
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --secondary: #18BC9C;
+            --accent: #E74C3C;
+            --bg: #F4F6F7;
+            --card-bg: #FFFFFF;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            margin: 0;
+            padding: 30px 15px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: var(--primary);
+            margin-top: 35px;
+            border-left: 5px solid var(--secondary);
+            padding-left: 12px;
+        }
+        h3 {
+            color: #2980B9;
+            margin-top: 25px;
+            font-size: 1.2em;
+        }
+        p {
+            font-size: 11pt;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            text-align: center;
+            font-size: 10.5pt;
+        }
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+        .formula-box {
+            background: #EBF5FB;
+            padding: 20px;
+            border-left: 5px solid #3498DB;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .math-block {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #2C3E50;
+            background: #FDFEFE;
+            padding: 10px 15px;
+            border: 1px dashed #BDC3C7;
+            display: block;
+            margin: 10px 0;
+            font-size: 1.15em;
+            overflow-x: auto;
+        }
+        .btn-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+        button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(24, 188, 156, 0.3);
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #128F76;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(24, 188, 156, 0.4);
+        }
+        .result-section {
+            background: #FAFDFB;
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid var(--secondary);
+            margin-top: 30px;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        .highlight-red {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        .highlight-green {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Reporte de Laboratorio: Prueba F de Fisher</h1>
+    
+    <h2>1. Enunciado del Experimento</h2>
+    <p>Se diseñó un experimento sencillo para evaluar y comparar estadísticamente la precisión (variabilidad) de dos instrumentos volumétricos comunes en ingeniería química: un <strong>Vaso de Precipitados (Beaker)</strong> y una <strong>Probeta</strong>. El objetivo consiste en medir un volumen nominal de 50 mL de agua, registrar la masa obtenida en gramos a través de 10 réplicas independientes por instrumento, y aplicar una prueba de hipótesis F de Fisher con un nivel de confianza del 95% (&alpha; = 0.05) para determinar si el vaso de precipitados posee una varianza significativamente mayor.</p>
+
+    <h2>2. Tabla de Datos Recolectados (Pesos en gramos)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Toma (n)</th>
+                <th>Vaso de Precipitados (g)</th>
+                <th>Probeta (g)</th>
+            </tr>
+        </thead>
+        <tbody id="data-table">
+            </tbody>
+    </table>
+
+    <h2>3. Ecuaciones Empleadas</h2>
+    <div class="formula-box">
+        <p><strong>Hipótesis del Diseño:</strong><br>
+        • H₀: S₁² = S₂² (Ambos instrumentos poseen la misma precisión)<br>
+        • H₁: S₁² > S₂² (La variabilidad del vaso de precipitados es mayor que la de la probeta)</p>
+        
+        <p><strong>Varianza Muestral:</strong></p>
+        <div class="math-block">S² = Σ(x_i - x̄)² / (n - 1)</div>
+        
+        <p><strong>Estadístico F de Fisher:</strong></p>
+        <div class="math-block">F = S_mayor² / S_menor²</div>
+    </div>
+
+    <div class="btn-container">
+        <button onclick="mostrarProcedimiento()">Ver Resultados y Procedimiento Completo</button>
+    </div>
+    
+    <div id="procedimiento-area" class="result-section" style="display:none;">
+        <h2>4. Memoria de Cálculo (Procedimiento Paso a Paso)</h2>
+        
+        <h3>Paso 4.1: Cálculo de las Medias Aritméticas (x̄)</h3>
+        <p>Se realiza la sumatoria de los pesos de las 10 tomas y se divide entre N=10.</p>
+        <div class="math-block" id="calc-media-vaso"></div>
+        <div class="math-block" id="calc-media-probeta"></div>
+
+        <h3>Paso 4.2: Cálculo de la Suma de los Cuadrados de las Desviaciones Σ(x_i - x̄)²</h3>
+        <p>A cada medición se le resta su promedio, se eleva al cuadrado y se acumula el resultado:</p>
+        <div class="math-block" id="calc-ss-vaso"></div>
+        <div class="math-block" id="calc-ss-probeta"></div>
+
+        <h3>Paso 4.3: Cálculo de las Varianzas Muestrales (S²)</h3>
+        <p>Se divide la suma de cuadrados entre los grados de libertad (n - 1 = 9):</p>
+        <div class="math-block" id="calc-var-vaso"></div>
+        <div class="math-block" id="calc-var-probeta"></div>
+
+        <h3>Paso 4.4: Sustitución en el Estadístico F de Fisher</h3>
+        <p>Dividimos la varianza mayor (Vaso) entre la varianza menor (Probeta):</p>
+        <div class="math-block" id="calc-f-final"></div>
+
+        <h2>5. Resultados de la Prueba de Hipótesis</h2>
+        <table>
+            <tr>
+                <th>Métrica Estadística</th>
+                <th>Valor Obtenido</th>
+            </tr>
+            <tr>
+                <td><strong>Estadístico F Calculado</strong></td>
+                <td class="highlight-red" id="tab-f-calc"></td>
+            </tr>
+            <tr>
+                <td><strong>Valor F Crítico de Tablas (&alpha;=0.05; GL=9,9)</strong></td>
+                <td class="highlight-green">3.1789</td>
+            </tr>
+            <tr>
+                <td><strong>p-valor (Probabilidad obtenida)</strong></td>
+                <td id="tab-p-value">0.000994</td>
+            </tr>
+        </table>
+
+        <h2>6. Conclusión Estadística e Interpretación Técnica</h2>
+        <p>Dado que el valor del estadístico <strong class="highlight-red">F calculado (<span id="txt-f-calc"></span>)</strong> es significativamente superior al <strong class="highlight-green">F crítico de tablas (3.1789)</strong>, el experimento cae profundamente en la región de rechazo de la hipótesis nula. </p>
+        <p><strong>Decisión:</strong> Se rechaza H₀ en favor de H₁. Queda demostrado con un 95% de confianza que la varianza en el método del vaso de precipitados (0.1545) es estadísticamente mayor que la de la probeta (0.0153). Desde la perspectiva de la ingeniería química, esto valida experimentalmente el criterio técnico de descartar los vasos de precipitados para transferencias cuantitativas o mediciones de volumen analítico, debiendo preferirse instrumentos calibrados como probetas o pipetas volumétricas.</p>
+    </div>
+</div>
+
+<script>
+    // Vectores de datos reales provistos por el usuario
+    const vaso = [69.598, 69.899, 69.586, 69.220, 70.158, 69.689, 69.363, 69.001, 68.940, 69.805];
+    const probeta = [97.644, 97.453, 97.541, 97.457, 97.616, 97.309, 97.585, 97.411, 97.624, 97.325];
+
+    // Renderizar la tabla de datos inicial
+    const tbody = document.getElementById('data-table');
+    for (let i = 0; i < 10; i++) {
+        tbody.innerHTML += `<tr><td>${i+1}</td><td>${vaso[i].toFixed(3)}</td><td>${probeta[i].toFixed(3)}</td></tr>`;
+    }
+
+    function mostrarProcedimiento() {
+        // --- 1. PROMEDIOS ---
+        const sumVaso = vaso.reduce((a, b) => a + b, 0);
+        const sumProbeta = probeta.reduce((a, b) => a + b, 0);
+        const meanVaso = sumVaso / vaso.length;
+        const meanProbeta = sumProbeta / probeta.length;
+
+        document.getElementById('calc-media-vaso').innerHTML = `x̄_vaso = ${sumVaso.toFixed(3)} / 10 = ${meanVaso.toFixed(4)} g`;
+        document.getElementById('calc-media-probeta').innerHTML = `x̄_probeta = ${sumProbeta.toFixed(3)} / 10 = ${meanProbeta.toFixed(4)} g`;
+
+        // --- 2. SUMA DE CUADRADOS ---
+        const ssVaso = vaso.reduce((a, b) => a + Math.pow(b - meanVaso, 2), 0);
+        const ssProbeta = probeta.reduce((a, b) => a + Math.pow(b - meanProbeta, 2), 0);
+
+        document.getElementById('calc-ss-vaso').innerHTML = `Σ(x_i - x̄_vaso)² = (${vaso[0]} - ${meanVaso.toFixed(3)})² + ... + (${vaso[9]} - ${meanVaso.toFixed(3)})² = ${ssVaso.toFixed(4)}`;
+        document.getElementById('calc-ss-probeta').innerHTML = `Σ(x_i - x̄_prob)² = (${probeta[0]} - ${meanProbeta.toFixed(3)})² + ... + (${probeta[9]} - ${meanProbeta.toFixed(3)})² = ${ssProbeta.toFixed(4)}`;
+
+        // --- 3. VARIANZAS ---
+        const varVaso = ssVaso / (vaso.length - 1);
+        const varProbeta = ssProbeta / (probeta.length - 1);
+
+        document.getElementById('calc-var-vaso').innerHTML = `S₁² (Vaso) = ${ssVaso.toFixed(4)} / (10 - 1) = ${varVaso.toFixed(6)}`;
+        document.getElementById('calc-var-probeta').innerHTML = `S₂² (Probeta) = ${ssProbeta.toFixed(4)} / (10 - 1) = ${varProbeta.toFixed(6)}`;
+
+        // --- 4. ESTADÍSTICO F ---
+        const fStat = varVaso / varProbeta;
+
+        document.getElementById('calc-f-final').innerHTML = `F = S₁² / S₂² = ${varVaso.toFixed(6)} / ${varProbeta.toFixed(6)} = ${fStat.toFixed(4)}`;
+
+        // Llenar bloques de resultados y resúmenes
+        document.getElementById('tab-f-calc').innerText = fStat.toFixed(4);
+        document.getElementById('txt-f-calc').innerText = fStat.toFixed(4);
+
+        // Hacer visible toda la sección con efecto suave
+        document.getElementById('procedimiento-area').style.display = 'block';
+        
+        // Desplazamiento automático hacia los resultados
+        document.getElementById('procedimiento-area').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
